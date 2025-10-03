@@ -14,6 +14,8 @@ provider:
     COTIZACIONES_TABLE_NAME: ${self:custom.cotizacionesTableName} 
     S3_BUCKET_NAME: ${self:custom.s3BucketName}
     EVENT_BUS_NAME: ${self:custom.eventBusName}
+  iam:
+    role: arn:aws:iam::596693100669:role/LabRole
   iamRoleStatements:
     # Permisos para acceder al Secret de Aurora
     # - Effect: Allow

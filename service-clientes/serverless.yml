@@ -12,6 +12,8 @@ provider:
   environment: 
     CLIENTS_TABLE_NAME: ${self:custom.clientsTableName}
   # Rol IAM para las funciones Lambda de este servicio
+  iam:
+    role: arn:aws:iam::596693100669:role/LabRole
   iamRoleStatements:
     - Effect: Allow
       Action:

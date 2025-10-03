@@ -12,6 +12,8 @@ provider:
   environment:
     REQUESTS_TABLE_NAME: ${self:custom.requestsTableName}
     EVENT_BUS_NAME: ${self:custom.eventBusName} # Nombre del bus de eventos
+  iam:
+    role: arn:aws:iam::596693100669:role/LabRole
   iamRoleStatements:
     - Effect: Allow
       Action:
