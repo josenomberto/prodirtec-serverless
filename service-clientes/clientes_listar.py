@@ -1,0 +1,19 @@
+import boto3
+import os
+import json
+
+def lambda_handler(event, context):
+    dynamodb = boto3.resource('dynamodb')
+    #table_name = os.environ.get('CLIENTS_TABLE_NAME', 'ClientsTable-dev') # Usar una variable de entorno
+    table_name = os.environ.get('CLIENTS_TABLE_NAME') # Usar una variable de entorno
+    clients_table = dynamodb.Table(table_name)
+    # Lee todos los registros
+    response = clients_table.scan() 
+    items = response['Items']
+    num_reg = response['Count']
+    # Salida (json)
+    return {
+        'statusCode': 200,
+        'body': json.dumps(items),
+        'headers': {'Content-Type': 'application/json'}
+    }
