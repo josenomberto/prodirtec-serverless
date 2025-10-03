@@ -38,7 +38,7 @@ def handler(event, context):
         else:
             return {
                 'statusCode': 400,
-                'body': json.dumps({'message': f'Método o ruta no soportada. {http_method}'}),
+                'body': json.dumps({'message': f'Método o ruta no soportada.'}),
                 'headers': {'Content-Type': 'application/json'}
             }
     except Exception as e:
