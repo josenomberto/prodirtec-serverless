@@ -29,8 +29,12 @@ def handler(event, context):
             return create_client(event)
         elif http_method == 'GET' and client_id:
             return get_client(client_id)
+        elif http_method == 'GET':
+            return get_clients(event)
         elif http_method == 'PUT' and client_id:
             return update_client(client_id, event)
+        elif http_method == 'DELETE' and client_id:
+            return delete_client(client_id, event)
         else:
             return {
                 'statusCode': 400,
@@ -53,18 +57,32 @@ def create_client(event):
     body = json.loads(event['body'])
     new_client_id = str(uuid.uuid4())
     item = {
-        'client_id': new_client_id,
+        'cliente_id': new_client_id,
         'nombre': body.get('nombre'),
         'apellido': body.get('apellido'),
         'email': body.get('email'),
         'telefono': body.get('telefono'),
         'empresa_razon_social': body.get('empresa_razon_social'),
+        'cargo': body.get('cargo'),
         'fecha_registro': datetime.now().isoformat()
     }
     clients_table.put_item(Item=item)
     return {
         'statusCode': 201,
-        'body': json.dumps({'client_id': new_client_id, 'message': 'Cliente creado exitosamente.'}),
+        'body': json.dumps({'cliente_id': new_client_id, 'message': 'Cliente creado exitosamente.'}),
+        'headers': {'Content-Type': 'application/json'}
+    }
+
+
+def get_clients(event):
+    # Lee todos los registros
+    response = clients_table.scan() 
+    items = response['Items']
+    num_reg = response['Count']
+    # Salida (json)
+    return {
+        'statusCode': 200,
+        'body': json.dumps(items),
         'headers': {'Content-Type': 'application/json'}
     }
 
@@ -73,7 +91,7 @@ def get_client(client_id):
     """
     Obtiene los detalles de un cliente por su ID.
     """
-    response = clients_table.get_item(Key={'client_id': client_id})
+    response = clients_table.get_item(Key={'cliente_id': client_id})
     item = response.get('Item')
     if item:
         return {
@@ -116,7 +134,7 @@ def update_client(client_id, event):
         }
 
     response = clients_table.update_item(
-        Key={'client_id': client_id},
+        Key={'cliente_id': client_id},
         UpdateExpression=update_expression,
         ExpressionAttributeValues=expression_attribute_values,
         ExpressionAttributeNames=expression_attribute_names,
@@ -125,5 +143,25 @@ def update_client(client_id, event):
     return {
         'statusCode': 200,
         'body': json.dumps(response['Attributes']),
+        'headers': {'Content-Type': 'application/json'}
+    }
+
+
+def delete_client(client_id):
+    """
+    Borra un cliente por su ID.
+    """
+    response = clients_table.get_item(Key={'cliente_id': client_id})
+    item = response.get('Item')
+    if item:
+        response = clients_table.delete_item(Key={'cliente_id': client_id})
+        return {
+            'statusCode': 200,
+            'body': json.dumps(response),
+            'headers': {'Content-Type': 'application/json'}
+        }
+    return {
+        'statusCode': 404,
+        'body': json.dumps({'message': 'Cliente Borrado.'}),
         'headers': {'Content-Type': 'application/json'}
     }
