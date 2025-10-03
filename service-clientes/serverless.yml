@@ -43,27 +43,27 @@ functions:
           path: clientes/crear
           method: post
           cors: true # Habilita CORS para el frontend
-          integration: lambda-proxy
-      - http:
-          path: clientes/listar
-          method: get
-          cors: true # Habilita CORS para el frontend
-          integration: lambda-proxy
+          integration: lambda
+      # - http:
+      #     path: clientes/listar
+      #     method: get
+      #     cors: true # Habilita CORS para el frontend
+      #     integration: lambda-proxy
       - http:
           path: clientes/listar/{cliente_id}
           method: get
           cors: true
-          integration: lambda-proxy
+          integration: lambda
       - http:
           path: clientes/modificar/{cliente_id}
           method: put
           cors: true
-          integration: lambda-proxy
+          integration: lambda
       - http:
           path: clientes/eliminar/{cliente_id}
           method: delete
           cors: true
-          integration: lambda-proxy
+          integration: lambda
 
 resources:
   Resources:
