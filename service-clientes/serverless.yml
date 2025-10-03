@@ -1,0 +1,63 @@
+# service-clientes/serverless.yml
+org: jcnm78
+service: service-clientes
+
+provider:
+  name: aws
+  runtime: python3.9
+  stage: ${opt:stage, 'dev'} # Permite definir el stage: serverless deploy --stage prod
+  region: us-east-1
+  memorySize: 128
+  timeout: 30
+  environment: 
+    CLIENTS_TABLE_NAME: ${self:custom.clientsTableName}
+  # Rol IAM para las funciones Lambda de este servicio
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: !GetAtt ClientsTable.Arn
+
+custom:
+  clientsTableName: Clientes-${self:provider.stage}
+
+functions:
+  manageClients:
+    handler: clientes_lambda.handler # Apunta al archivo client_lambda.py y la función handler
+    events:
+      - http:
+          path: clientes
+          method: post
+          cors: true # Habilita CORS para el frontend
+      - http:
+          path: clientes/{cliente_id}
+          method: get
+          cors: true
+      - http:
+          path: clientes/{cliente_id}
+          method: put
+          cors: true
+
+resources:
+  Resources:
+    ClientsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.clientsTableName}
+        AttributeDefinitions:
+          - AttributeName: cliente_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: cliente_id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+outputs:
+  ClientsTableArn:
+    Description: ARN of the Clients DynamoDB table
+    Value: !GetAtt ClientsTable.Arn
+    Export:
+      Name: ${self:service}-${self:provider.stage}-ClientsTableArn

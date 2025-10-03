@@ -1,0 +1,76 @@
+# service-cotizador/serverless.yml
+org: jcnm78
+service: service-cotizador
+
+provider:
+  name: aws
+  runtime: python3.9
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
+  memorySize: 128
+  timeout: 30
+  environment:
+    REQUESTS_TABLE_NAME: ${self:custom.requestsTableName}
+    EVENT_BUS_NAME: ${self:custom.eventBusName} # Nombre del bus de eventos
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:PutItem
+        - dynamodb:GetItem
+      Resource: !GetAtt QuoteRequestsTable.Arn
+    - Effect: Allow
+      Action: events:PutEvents # Permiso para publicar eventos en EventBridge
+      Resource: !GetAtt ProdirtecEventBus.Arn # Referencia al ARN del EventBus
+
+custom:
+  requestsTableName: SolicitudesCotizacion-${self:provider.stage}
+  eventBusName: ProdirtecBus-${self:provider.stage} # Un EventBus por stage
+
+functions:
+  requestQuote:
+    handler: solicitudes_lambda.handler
+    events:
+      - http:
+          path: cotizaciones/solicitar
+          method: post
+          cors: true
+      - http:
+          path: cotizaciones/solicitudes/{solicitud_id}
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    QuoteRequestsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.requestsTableName}
+        AttributeDefinitions:
+          - AttributeName: solicitud_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: solicitud_id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    ProdirtecEventBus: # Definimos el EventBus aquí para que otros servicios lo importen
+      Type: AWS::Events::EventBus
+      Properties:
+        Name: ${self:custom.eventBusName}
+
+outputs:
+  QuoteRequestsTableArn:
+    Description: ARN of the Quote Requests DynamoDB table
+    Value: !GetAtt QuoteRequestsTable.Arn
+    Export:
+      Name: ${self:service}-${self:provider.stage}-QuoteRequestsTableArn
+  ProdirtecEventBusArn:
+    Description: ARN of the Prodirtec EventBus
+    Value: !GetAtt ProdirtecEventBus.Arn
+    Export:
+      Name: ${self:service}-${self:provider.stage}-EventBusArn
+  ProdirtecEventBusName:
+    Description: Name of the Prodirtec EventBus
+    Value: !Ref ProdirtecEventBus
+    Export:
+      Name: ${self:service}-${self:provider.stage}-EventBusName
