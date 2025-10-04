@@ -13,7 +13,7 @@ def lambda_handler(event, context):
 
     body = event['body']
     client_id = body.get('cliente_id')
-    
+
     update_expression = "SET "
     expression_attribute_values = {}
     expression_attribute_names = {} # Para evitar problemas con nombres reservados como 'name'
@@ -45,6 +45,6 @@ def lambda_handler(event, context):
     )
     return {
         'statusCode': 200,
-        'body': json.dumps(response['Attributes']),
+        'body': response['Attributes'],
         'headers': {'Content-Type': 'application/json'}
     }
