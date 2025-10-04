@@ -4,7 +4,7 @@ import json
 import uuid
 from datetime import datetime
 
-def lambda_handler(event):
+def lambda_handler(event,context):
     """
     Crea un nuevo cliente.
     """
