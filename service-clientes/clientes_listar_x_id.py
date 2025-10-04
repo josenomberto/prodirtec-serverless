@@ -23,6 +23,6 @@ def lambda_handler(event, context):
         'headers': {
             'Content-Type': 'application/json',
             'Access-Control-Allow-Origin': '*',  # Or specific origin like 'http://localhost:3000'
-            'Access-Control-Allow-Credentials': True, # If using credentials like cookies
+            #'Access-Control-Allow-Credentials': True, # If using credentials like cookies
         }
     }
