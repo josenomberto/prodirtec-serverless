@@ -35,6 +35,14 @@ functions:
         method: get
         cors: true # Habilita CORS para el frontend
         integration: lambda
+  ClientesListarxId:
+    handler: clientes_listar_x_id.lambda_handler
+    events:
+    - http:
+        path: clientes/listar
+        method: get
+        cors: true # Habilita CORS para el frontend
+        integration: lambda
   ClientesCrear:
     handler: clientes_crear.lambda_handler
     events:
