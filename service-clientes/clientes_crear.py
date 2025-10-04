@@ -13,7 +13,8 @@ def lambda_handler(event,context):
     table_name = os.environ.get('CLIENTS_TABLE_NAME') # Usar una variable de entorno
     clients_table = dynamodb.Table(table_name)
 
-    body = json.loads(event['body'])
+    # body = json.loads(event['body'])
+    body = event['body']
     new_client_id = str(uuid.uuid4())
     item = {
         'cliente_id': new_client_id,
