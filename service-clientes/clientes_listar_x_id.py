@@ -9,8 +9,10 @@ def lambda_handler(event, context):
     clients_table = dynamodb.Table(table_name)
     # Lee todos los registros
     #response = clients_table.scan()
-    body = event['body']
-    response = clients_table.get_item(Key={'cliente_id': body.get('cliente_id')})
+
+    path_parameters = event.get('pathParameters', {})
+    client_id = path_parameters.get('cliente_id')
+    response = clients_table.get_item(Key={'cliente_id': client_id})
     items = response['Items']
     num_reg = response['Count']
     # Salida (json)

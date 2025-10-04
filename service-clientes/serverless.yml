@@ -39,7 +39,7 @@ functions:
     handler: clientes_listar_x_id.lambda_handler
     events:
     - http:
-        path: clientes/listar/id
+        path: clientes/listar/{cliente_id}
         method: get
         cors: true # Habilita CORS para el frontend
         integration: lambda
