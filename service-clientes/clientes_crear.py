@@ -16,19 +16,27 @@ def lambda_handler(event,context):
     # body = json.loads(event['body'])
     body = event['body']
     new_client_id = str(uuid.uuid4())
+    # item = {
+    #     'cliente_id': new_client_id,
+    #     'nombre': body.get('nombre'),
+    #     'apellido': body.get('apellido'),
+    #     'email': body.get('email'),
+    #     'telefono': body.get('telefono'),
+    #     'empresa_razon_social': body.get('empresa_razon_social'),
+    #     'cargo': body.get('cargo'),
+    #     'fecha_registro': datetime.now().isoformat()
+    # }
     item = {
         'cliente_id': new_client_id,
-        'nombre': body.get('nombre'),
-        'apellido': body.get('apellido'),
-        'email': body.get('email'),
-        'telefono': body.get('telefono'),
-        'empresa_razon_social': body.get('empresa_razon_social'),
-        'cargo': body.get('cargo'),
-        'fecha_registro': datetime.now().isoformat()
+        'datos': body
     }
-    clients_table.put_item(Item=item)
+    response = clients_table.put_item(Item=item)
+    # return {
+    #     'statusCode': 201,
+    #     'body': json.dumps({'cliente_id': new_client_id, 'message': 'Cliente creado exitosamente.'}),
+    #     'headers': {'Content-Type': 'application/json'}
+    # }
     return {
-        'statusCode': 201,
-        'body': json.dumps({'cliente_id': new_client_id, 'message': 'Cliente creado exitosamente.'}),
-        'headers': {'Content-Type': 'application/json'}
+        'statusCode': 200,
+        'response': response
     }
