@@ -20,7 +20,7 @@ def lambda_handler(event, context):
         response = clients_table.delete_item(Key={'cliente_id': client_id})
         return {
             'statusCode': 200,
-            'body': json.dumps(response),
+            'body': response,
             'headers': {'Content-Type': 'application/json'}
         }
     return {
