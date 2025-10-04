@@ -43,7 +43,14 @@ functions:
         method: post
         cors: true # Habilita CORS para el frontend
         integration: lambda
-
+  ClientesEliminar:
+    handler: clientes_eliminar.lambda_handler
+    events:
+    - http:
+        path: clientes/eliminar
+        method: delete
+        cors: true # Habilita CORS para el frontend
+        integration: lambda
   manageClients:
     handler: clientes_lambda.handler # Apunta al archivo clientes_lambda.py y la función handler
     events:
@@ -67,11 +74,11 @@ functions:
           method: put
           cors: true
           integration: lambda
-      - http:
-          path: clientes/eliminar/{cliente_id}
-          method: delete
-          cors: true
-          integration: lambda
+      # - http:
+      #     path: clientes/eliminar/{cliente_id}
+      #     method: delete
+      #     cors: true
+      #     integration: lambda
 
 resources:
   Resources:
