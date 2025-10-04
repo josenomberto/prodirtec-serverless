@@ -13,12 +13,12 @@ def lambda_handler(event, context):
     path_parameters = event.get('path', {})
     client_id = path_parameters.get('cliente_id')
     response = clients_table.get_item(Key={'cliente_id': client_id})
-    items = response['Items']
+    item = response['Item']
     num_reg = response['Count']
     # Salida (json)
     return {
         'statusCode': 200,
-        'body': items,
+        'body': item,
         # 'body': json.dumps(items),
         'headers': {'Content-Type': 'application/json'}
     }
