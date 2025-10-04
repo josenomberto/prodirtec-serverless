@@ -10,7 +10,7 @@ def lambda_handler(event, context):
     # Lee todos los registros
     #response = clients_table.scan()
 
-    path_parameters = event.get('pathParameters', {})
+    path_parameters = event.get('path', {})
     client_id = path_parameters.get('cliente_id')
     response = clients_table.get_item(Key={'cliente_id': client_id})
     items = response['Items']

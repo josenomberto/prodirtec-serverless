@@ -214,15 +214,7 @@
         async function handleEdit(event) {
             const clientId = event.target.dataset.id;
             try {
-                const response = await fetch(API_BASE_URL + "/list/id", {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        cliente_id: clientId
-                    }),
-                });
+                const response = await fetch(API_BASE_URL + "/list/" + clientId)
                 if (!response.ok) {
                     throw new Error(`Error al cargar datos para modificar: ${response.statusText}`);
                 }
