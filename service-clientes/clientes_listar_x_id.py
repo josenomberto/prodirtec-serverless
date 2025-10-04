@@ -14,7 +14,6 @@ def lambda_handler(event, context):
     client_id = path_parameters.get('cliente_id')
     response = clients_table.get_item(Key={'cliente_id': client_id})
     item = response['Item']
-    num_reg = response['Count']
     # Salida (json)
     return {
         'statusCode': 200,
