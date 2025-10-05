@@ -170,7 +170,7 @@
             e.preventDefault();
 
             const clientId = clientIdInput.value;
-            const clientData = {
+            const clientBody = {
                 nombre: document.getElementById('nombre').value,
                 apellido: document.getElementById('apellido').value,
                 email: document.getElementById('email').value,
@@ -182,8 +182,10 @@
             const isUpdate = !!clientId; // Determina si es POST o PUT
 
             try {
-                const url = isUpdate ? API_BASE_URL + "/modificar" : API_BASE_URL + "/crear";
+                const url = isUpdate ? API_BASE_URL + "/modificar": API_BASE_URL + "/crear";
                 const method = isUpdate ? 'PUT' : 'POST';
+
+                const clientData = isUpdate? { cliente_id: clientId, ...clientBody } : { ...clientBody };
 
                 const response = await fetch(url, {
                     method: method,
@@ -213,23 +215,24 @@
         // ----------------------------------------------------------------------
         async function handleEdit(event) {
             const clientId = event.target.dataset.id;
+            console.log(clientId);
             try {
-                const response = await fetch(API_BASE_URL + "/list/" + clientId)
+                const response = await fetch(API_BASE_URL + "/listar/" + clientId)
                 if (!response.ok) {
                     throw new Error(`Error al cargar datos para modificar: ${response.statusText}`);
                 }
                 const client = await response.json();
-                
+                console.log(client)
                 // Cargar datos en el formulario
-                document.getElementById('clientId').value = client.id;
-                document.getElementById('nombre').value = client.nombre;
-                document.getElementById('apellido').value = client.apellido;
-                document.getElementById('email').value = client.email;
-                document.getElementById('telefono').value = client.telefono;
-                document.getElementById('empresa_razon_social').value = client.empresa_razon_social;
-                document.getElementById('cargo').value = client.cargo;
+                document.getElementById('clientId').value = client.body.cliente_id;
+                document.getElementById('nombre').value = client.body.nombre;
+                document.getElementById('apellido').value = client.body.apellido;
+                document.getElementById('email').value = client.body.email;
+                document.getElementById('telefono').value = client.body.telefono;
+                document.getElementById('empresa_razon_social').value = client.body.empresa_razon_social;
+                document.getElementById('cargo').value = client.body.cargo;
                 submitBtn.textContent = 'Modificar Cliente';
-                showMessage(`Modificando cliente con ID: ${client.id}`, 'success');
+                showMessage(`Modificando cliente con ID: ${client.body.cliente_id}`, 'success');
 
             } catch (error) {
                 console.error('Error al obtener cliente para editar:', error);
