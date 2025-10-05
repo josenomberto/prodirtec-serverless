@@ -89,6 +89,12 @@
             </table>
         </div>
 
+        <div class="pagination-controls">
+            <button id="prevPageBtn">Anterior</button>
+            <span id="currentPageInfo">Página 1 de 1</span>
+            <button id="nextPageBtn">Siguiente</button>
+        </div>
+
     </div>
 
     <script>
@@ -106,6 +112,9 @@
         const clientsTableBody = document.getElementById('clientsTableBody');
         const clientIdInput = document.getElementById('clientId');
         const messageDiv = document.getElementById('message');
+        const prevPageBtn = document.getElementById('prevPageBtn');
+        const nextPageBtn = document.getElementById('nextPageBtn');
+        const currentPageInfo = document.getElementById('currentPageInfo');
 
         /**
          * Muestra un mensaje en el área de notificaciones.
@@ -130,9 +139,9 @@
                 if (!response.ok) {
                     throw new Error(`Error al listar: ${response.statusText}`);
                 }
-                const clients = await response.json();
-                console.log(clients);
-                renderClients(clients);
+                allClients = await response.json();
+                currentPage = 1;
+                renderClients(allClients);
             } catch (error) {
                 console.error('Error al listar clientes:', error);
                 showMessage('No se pudieron cargar los clientes. Asegúrate de que la API esté corriendo.', 'error');
@@ -145,29 +154,44 @@
          */
         function renderClients(clients) {
             clientsTableBody.innerHTML = '';
-            if (clients.length === 0) {
+
+            // 1. Calcular índices de paginación
+            const totalPages = Math.ceil(clients.length / ITEMS_PER_PAGE);
+            const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+            const endIndex = startIndex + ITEMS_PER_PAGE;
+      
+            // 2. Obtener los clientes para la página actual
+            const clientsToShow = clients.body.slice(startIndex, endIndex);
+
+            // 3. Renderizar filas
+            if (clientsToShow.length === 0) {
                 clientsTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay clientes registrados.</td></tr>';
-                return;
+            } else {
+                clientsToShow.forEach(client => {
+                    const row = clientsTableBody.insertRow();
+                    row.innerHTML = `
+                        <td>${client.cliente_id || 'N/A'}</td>
+                        <td>${client.nombre}</td>
+                        <td>${client.apellido}</td>
+                        <td>${client.email}</td>
+                        <td>${client.telefono || 'N/A'}</td>
+                        <td>${client.empresa_razon_social || 'N/A'}</td>
+                        <td>${client.cargo || 'N/A'}</td>
+                        <td>${client.fecha_registro || 'N/A'}</td>
+                        <td class="action-cell">
+                            <button class="edit-btn" data-id="${client.cliente_id}">Modificar</button>
+                            <button class="delete-btn" data-id="${client.cliente_id}">Eliminar</button>
+                        </td>
+                    `;
+                });
             }
-            clients.body.forEach(client => {
-                const row = clientsTableBody.insertRow();
-                row.innerHTML = `
-                    <td>${client.cliente_id || 'N/A'}</td>
-                    <td>${client.nombre}</td>
-                    <td>${client.apellido}</td>
-                    <td>${client.email}</td>
-                    <td>${client.telefono || 'N/A'}</td>
-                    <td>${client.empresa_razon_social || 'N/A'}</td>
-                    <td>${client.cargo || 'N/A'}</td>
-                    <td>${client.fecha_registro || 'N/A'}</td>
-                    <td>
-                        <button class="edit-btn" data-id="${client.cliente_id}">Modificar</button>
-                        <button class="delete-btn" data-id="${client.cliente_id}">Eliminar</button>
-                    </td>
-                `;
-            });
-            
-            // Adjuntar listeners de eventos a los nuevos botones
+
+            // 4. Actualizar controles de paginación
+            currentPageInfo.textContent = `Página ${clients.length > 0 ? currentPage : 0} de ${totalPages}`;
+            prevPageBtn.disabled = currentPage === 1;
+            nextPageBtn.disabled = currentPage === totalPages || clients.length === 0;
+
+            // 5. Adjuntar listeners de eventos a los nuevos botones
             document.querySelectorAll('.edit-btn').forEach(button => {
                 button.addEventListener('click', handleEdit);
             });
@@ -175,6 +199,25 @@
                 button.addEventListener('click', handleDelete);
             });
         }
+
+        // ----------------------------------------------------------------------
+        // Lógica de Paginación
+        // ----------------------------------------------------------------------
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderClients(allClients);
+            }
+        });
+
+        nextPageBtn.addEventListener('click', () => {
+            const totalPages = Math.ceil(allClients.length / ITEMS_PER_PAGE);
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderClients(allClients);
+            }
+        });
+
 
         // ----------------------------------------------------------------------
         // OPERACIÓN 2 & 3: CREAR (POST) / MODIFICAR (PUT) ➕✏️
