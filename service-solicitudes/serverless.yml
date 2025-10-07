@@ -29,17 +29,41 @@ custom:
   eventBusName: ProdirtecBus-${self:provider.stage} # Un EventBus por stage
 
 functions:
-  requestQuote:
-    handler: solicitudes_lambda.handler
+  SolicitudesListar:
+    handler: solicitudes_listar.lambda_handler
     events:
-      - http:
-          path: cotizaciones/solicitar
-          method: post
-          cors: true
-      - http:
-          path: cotizaciones/solicitudes/{solicitud_id}
-          method: get
-          cors: true
+    - http:
+        path: solicitudes/listar/
+        method: get
+        cors: true # Habilita CORS para el frontend
+        integration: lambda
+  SolicitudesListarxId:
+    handler: solicitudes_listar_x_id.lambda_handler
+    events:
+    - http:
+        path: solicitudes/listar/{solicitud_id}
+        method: get
+        cors: true # Habilita CORS para el frontend
+        integration: lambda
+  SolicitudesCrear:
+    handler: solicitudes_crear.lambda_handler
+    events:
+    - http:
+        path: solicitudes/crear
+        method: post
+        cors: true # Habilita CORS para el frontend
+        integration: lambda
+  # requestQuote:
+  #   handler: solicitudes_lambda.handler
+  #   events:
+  #     - http:
+  #         path: cotizaciones/solicitar
+  #         method: post
+  #         cors: true
+  #     - http:
+  #         path: cotizaciones/solicitudes/{solicitud_id}
+  #         method: get
+  #         cors: true
 
 resources:
   Resources:
@@ -54,7 +78,6 @@ resources:
           - AttributeName: solicitud_id
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
-
     ProdirtecEventBus: # Definimos el EventBus aquí para que otros servicios lo importen
       Type: AWS::Events::EventBus
       Properties:
