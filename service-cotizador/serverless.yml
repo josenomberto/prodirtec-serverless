@@ -37,7 +37,7 @@ provider:
     # Permisos para publicar eventos
     - Effect: Allow
       Action: events:PutEvents
-      Resource: !ImportValue service-cotizador-${self:provider.stage}-EventBusArn # Importa el ARN del EventBus
+      Resource: !ImportValue service-solicitudes-${self:provider.stage}-EventBusArn # Importa el ARN del EventBus
     # Permisos para invocar Step Functions (si se usara para flujos complejos)
     # - Effect: Allow
     #   Action: states:StartExecution
@@ -47,7 +47,7 @@ custom:
   #auroraSecretArn: arn:aws:secretsmanager:sa-east-1:<YOUR_AWS_ACCOUNT_ID>:secret:your-aurora-db-secret-xxxx # <--- REEMPLAZAR
   cotizacionesTableName: Cotizaciones-${self:provider.stage}
   s3BucketName: prodirtec-cotizaciones-${self:provider.stage}-${aws:accountId}
-  eventBusName: !ImportValue service-cotizador-${self:provider.stage}-EventBusName # Importa el nombre del EventBus
+  eventBusName: !ImportValue service-solicitudes-${self:provider.stage}-EventBusName # Importa el nombre del EventBus
 
 # Plugin para manejar dependencias de Python (ej. psycopg2-binary, reportlab)
 plugins:
@@ -58,12 +58,12 @@ package:
   exclude:
     - ./**
   include:
-    - service-cotizador/cotizador_lambda.py
-    - service-cotizador/requirements.txt
+    - cotizador_lambda.py
+    - requirements.txt
 
 functions:
   generateQuote:
-    handler: service-cotizador/cotizador_lambda.handler
+    handler: cotizador_lambda.handler
     # Define que esta función se activa por un evento de EventBridge
     events:
       - eventBridge:
@@ -74,12 +74,12 @@ functions:
     package:
       individually: true
       include:
-        - service-cotizador/cotizador_lambda.py
-        - service-cotizador/requirements.txt
+        - cotizador_lambda.py
+        - requirements.txt
         # El plugin serverless-python-requirements se encarga de las dependencias
 
   getQuote:
-    handler: service-cotizador/cotizador_lambda.handler
+    handler: cotizador_lambda.handler
     events:
       - http:
           path: cotizaciones/{cotizacion_id}
@@ -87,7 +87,7 @@ functions:
           cors: true
 
   adjustQuote:
-    handler: service-cotizador/cotizador_lambda.handler
+    handler: cotizador_lambda.handler
     events:
       - http:
           path: cotizaciones/{cotizacion_id}/ajustar
@@ -95,7 +95,7 @@ functions:
           cors: true
 
   approveQuote:
-    handler: service-cotizador/cotizador_lambda.handler
+    handler: cotizador_lambda.handler
     events:
       - http:
           path: cotizaciones/{cotizacion_id}/aprobar

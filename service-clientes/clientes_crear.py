@@ -37,6 +37,7 @@ def lambda_handler(event,context):
     #     'headers': {'Content-Type': 'application/json'}
     # }
     return {
-        'statusCode': 200,
+        'statusCode': 201,
+        'body': json.dumps({'cliente_id': new_client_id, 'message': 'Cliente creado exitosamente.'}),
         'response': response
     }

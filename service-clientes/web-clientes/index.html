@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Clientes - Frontend</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1, h2 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; background-color: #fafafa; }
+        label { font-weight: bold; }
+        input[type="text"], input[type="email"], input[type="number"] { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s; }
+        button:hover { background-color: #0056b3; }
+        .delete-btn { background-color: #dc3545; }
+        .delete-btn:hover { background-color: #c82333; }
+        .edit-btn { background-color: #ffc107; color: #333; }
+        .edit-btn:hover { background-color: #e0a800; }
+        .action-cell { white-space: nowrap; } /* Evita que los botones se envuelvan */
+        .table-responsive { overflow-x: auto; /* Permite scroll horizontal si es necesario */ }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #007bff; color: white; }
+        .error { color: red; margin-bottom: 10px; font-weight: bold; }
+        .pagination-controls { display: flex; justify-content: flex-end; align-items: center; margin-top: 10px; }
+        .pagination-controls button { margin-left: 5px; padding: 5px 10px; }
+        .pagination-controls span { margin: 0 10px; font-weight: bold; }
+        .logo {position: relative; top: 10px; left: 1px; width: 150px; height: auto;}
+    </style>
+</head>
+<body>
+
+
+
+    <div class="container">
+
+        <img src="Logo-Prodirtec-H.svg" alt="Logo" class="logo">
+
+        <h1>Servicio de Gestión de Clientes 👨‍💼</h1>
+
+        <div id="message" class="error"></div>
+
+        <h2>Crear / Modificar Cliente</h2>
+        <form id="clientForm">
+            <input type="hidden" id="clientId">
+            <div>
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" required>
+            </div>
+            <div>
+                <label for="apellido">Apellido:</label>
+                <input type="text" id="apellido" required>
+            </div>
+            <div>
+                <label for="email">Email:</label>
+                <input type="email" id="email" required>
+            </div>
+            <div>
+                <label for="telefono">Teléfono:</label>
+                <input type="text" id="telefono">
+            </div>
+            <div>
+                <label for="empresa_razon_social">Empresa:</label>
+                <input type="text" id="empresa_razon_social">
+            </div>
+            <div>
+                <label for="cargo">Cargo:</label>
+                <input type="text" id="cargo">
+            </div>
+            <div style="grid-column: 1 / 3; text-align: right;">
+                <button type="submit" id="submitBtn">Crear Cliente</button>
+            </div>
+        </form>
+
+        <hr>
+
+        <h2>Lista de Clientes</h2>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Email</th>
+                        <th>Teléfono</th>
+                        <th>Empresa</th>
+                        <th>Cargo</th>
+                        <th>Fecha Registro</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="clientsTableBody">
+                    </tbody>
+            </table>
+        </div>
+
+    </div>
+
+    <script>
+        // URL base de la API del microservicio.
+        const API_BASE_URL = 'https://7eiuf4u7e9.execute-api.us-east-1.amazonaws.com/dev/clientes';
+
+        // **Variables de Paginación**
+        const ITEMS_PER_PAGE = 5;
+        let allClients = [];
+        let currentPage = 1;
+        
+        // Elementos del DOM
+        const form = document.getElementById('clientForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const clientsTableBody = document.getElementById('clientsTableBody');
+        const clientIdInput = document.getElementById('clientId');
+        const messageDiv = document.getElementById('message');
+
+        /**
+         * Muestra un mensaje en el área de notificaciones.
+         * @param {string} msg - El mensaje a mostrar.
+         * @param {string} type - 'success' o 'error'.
+         */
+        function showMessage(msg, type = 'error') {
+            messageDiv.textContent = msg;
+            messageDiv.style.color = type === 'success' ? 'green' : 'red';
+            setTimeout(() => {
+                messageDiv.textContent = '';
+                messageDiv.style.color = 'red'; // Restablecer el color por defecto si es error
+            }, 5000);
+        }
+
+        // ----------------------------------------------------------------------
+        // OPERACIÓN 1: LISTAR CLIENTES (GET) 📋
+        // ----------------------------------------------------------------------
+        async function listClients() {
+            try {
+                const response = await fetch(API_BASE_URL + "/listar");
+                if (!response.ok) {
+                    throw new Error(`Error al listar: ${response.statusText}`);
+                }
+                const clients = await response.json();
+                console.log(clients);
+                renderClients(clients);
+            } catch (error) {
+                console.error('Error al listar clientes:', error);
+                showMessage('No se pudieron cargar los clientes. Asegúrate de que la API esté corriendo.', 'error');
+            }
+        }
+
+        /**
+         * Renderiza la lista de clientes en la tabla.
+         * @param {Array} clients - Array de objetos cliente.
+         */
+        function renderClients(clients) {
+            clientsTableBody.innerHTML = '';
+            if (clients.length === 0) {
+                clientsTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay clientes registrados.</td></tr>';
+                return;
+            }
+            clients.body.forEach(client => {
+                const row = clientsTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${client.cliente_id || 'N/A'}</td>
+                    <td>${client.nombre}</td>
+                    <td>${client.apellido}</td>
+                    <td>${client.email}</td>
+                    <td>${client.telefono || 'N/A'}</td>
+                    <td>${client.empresa_razon_social || 'N/A'}</td>
+                    <td>${client.cargo || 'N/A'}</td>
+                    <td>${client.fecha_registro || 'N/A'}</td>
+                    <td>
+                        <button class="edit-btn" data-id="${client.cliente_id}">Modificar</button>
+                        <button class="delete-btn" data-id="${client.cliente_id}">Eliminar</button>
+                    </td>
+                `;
+            });
+            
+            // Adjuntar listeners de eventos a los nuevos botones
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', handleEdit);
+            });
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', handleDelete);
+            });
+        }
+
+        // ----------------------------------------------------------------------
+        // OPERACIÓN 2 & 3: CREAR (POST) / MODIFICAR (PUT) ➕✏️
+        // ----------------------------------------------------------------------
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const clientId = clientIdInput.value;
+            const clientBody = {
+                nombre: document.getElementById('nombre').value,
+                apellido: document.getElementById('apellido').value,
+                email: document.getElementById('email').value,
+                telefono: document.getElementById('telefono').value,
+                empresa_razon_social: document.getElementById('empresa_razon_social').value,
+                cargo: document.getElementById('cargo').value
+            };
+
+            const isUpdate = !!clientId; // Determina si es POST o PUT
+
+            try {
+                const url = isUpdate ? API_BASE_URL + "/modificar": API_BASE_URL + "/crear";
+                const method = isUpdate ? 'PUT' : 'POST';
+
+                const clientData = isUpdate? { cliente_id: clientId, ...clientBody } : { ...clientBody };
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(clientData)
+                });
+
+                if (!response.ok) {
+                    const errorDetails = await response.json().catch(() => ({ message: response.statusText }));
+                    throw new Error(`Error ${isUpdate ? 'modificando' : 'creando'} cliente: ${errorDetails.message || response.statusText}`);
+                }
+
+                showMessage(`Cliente ${isUpdate ? 'modificado' : 'creado'} con éxito.`, 'success');
+                form.reset(); // Limpiar formulario
+                clientIdInput.value = ''; // Resetear ID oculto
+                submitBtn.textContent = 'Crear Cliente'; // Cambiar botón a 'Crear'
+                listClients(); // Recargar la lista
+                
+            } catch (error) {
+                console.error('Error en operación POST/PUT:', error);
+                showMessage(error.message, 'error');
+            }
+        });
+
+        // ----------------------------------------------------------------------
+        // Función auxiliar para precargar datos en el formulario para Modificar
+        // ----------------------------------------------------------------------
+        async function handleEdit(event) {
+            const clientId = event.target.dataset.id;
+            console.log(clientId);
+            try {
+                const response = await fetch(API_BASE_URL + "/listar/" + clientId)
+                if (!response.ok) {
+                    throw new Error(`Error al cargar datos para modificar: ${response.statusText}`);
+                }
+                const client = await response.json();
+                console.log(client)
+                // Cargar datos en el formulario
+                document.getElementById('clientId').value = client.body.cliente_id;
+                document.getElementById('nombre').value = client.body.nombre;
+                document.getElementById('apellido').value = client.body.apellido;
+                document.getElementById('email').value = client.body.email;
+                document.getElementById('telefono').value = client.body.telefono;
+                document.getElementById('empresa_razon_social').value = client.body.empresa_razon_social;
+                document.getElementById('cargo').value = client.body.cargo;
+                submitBtn.textContent = 'Modificar Cliente';
+                showMessage(`Modificando cliente con ID: ${client.body.cliente_id}`, 'success');
+
+            } catch (error) {
+                console.error('Error al obtener cliente para editar:', error);
+                showMessage('No se pudo cargar la información del cliente.', 'error');
+            }
+        }
+        
+        // ----------------------------------------------------------------------
+        // OPERACIÓN 4: ELIMINAR CLIENTE (DELETE) 🗑️
+        // ----------------------------------------------------------------------
+        async function handleDelete(event) {
+            const clientId = event.target.dataset.id;
+            if (!confirm(`¿Estás seguro de que quieres eliminar el cliente con ID ${clientId}?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(API_BASE_URL + "/eliminar", {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        cliente_id: clientId
+                    }),
+
+                });
+                if (!response.ok) {
+                    const errorDetails = await response.json().catch(() => ({ message: response.statusText }));
+                    throw new Error(`Error al eliminar: ${errorDetails.message || response.statusText}`);
+                }
+
+                showMessage(`Cliente con ID ${clientId} eliminado con éxito.`, 'success');
+                listClients(); // Recargar la lista
+
+            } catch (error) {
+                console.error('Error al eliminar cliente:', error);
+                showMessage(error.message, 'error');
+            }
+        }
+
+        // ----------------------------------------------------------------------
+        // INICIO
+        // ----------------------------------------------------------------------
+        document.addEventListener('DOMContentLoaded', listClients);
+    </script>
+</body>
+</html>

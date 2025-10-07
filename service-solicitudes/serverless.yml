@@ -1,6 +1,6 @@
-# service-cotizador/serverless.yml
+# service-solicitudes/serverless.yml
 org: jcnm78
-service: service-cotizador
+service: service-solicitudes
 
 provider:
   name: aws
