@@ -3,16 +3,21 @@ import os
 import json
 
 def lambda_handler(event, context):
+    """
+    Listar solicitud de cotización por id de solicitud.
+    """
     dynamodb = boto3.resource('dynamodb')
-    #table_name = os.environ.get('CLIENTS_TABLE_NAME', 'ClientsTable-dev') # Usar una variable de entorno
-    table_name = os.environ.get('CLIENTS_TABLE_NAME') # Usar una variable de entorno
-    clients_table = dynamodb.Table(table_name)
-    # Lee todos los registros
-    #response = clients_table.scan()
+    #table_name = os.environ.get('REQUESTS_TABLE_NAME', 'QuoteRequests-dev')
+    table_name = os.environ.get('REQUESTS_TABLE_NAME')
+    requests_table = dynamodb.Table(table_name)
+
+    # eventbridge = boto3.client('events')
+    # #event_bus_name = os.environ.get('EVENT_BUS_NAME', 'ProdirtecBus-dev')
+    # event_bus_name = os.environ.get('EVENT_BUS_NAME')
 
     path_parameters = event.get('path', {})
-    client_id = path_parameters.get('cliente_id')
-    response = clients_table.get_item(Key={'cliente_id': client_id})
+    request_id = path_parameters.get('solicitud_id')
+    response = requests_table.get_item(Key={'solicitud_id': request_id})
     item = response['Item']
     # Salida (json)
     return {
