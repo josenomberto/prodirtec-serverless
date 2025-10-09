@@ -1,0 +1,80 @@
+{
+	"info": {
+		"_postman_id": "25d8d0bb-c8b2-4e9f-9b07-e2d7a80523e1",
+		"name": "prodirtec-solicitudes",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47972729",
+		"_collection_link": "https://jose-carlos-nomberto-montenegro-s-team.postman.co/workspace/Team-Workspace~85023df0-e686-4597-8c90-2b23088d1948/collection/47972729-25d8d0bb-c8b2-4e9f-9b07-e2d7a80523e1?action=share&source=collection_link&creator=47972729"
+	},
+	"item": [
+		{
+			"name": "SolicitudesListarId",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{enlace_api_gw}}/dev/cursos/listar",
+					"protocol": "https",
+					"host": [
+						"{{enlace_api_gw}}"
+					],
+					"path": [
+						"dev",
+						"cursos",
+						"listar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SolicitudesListar",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{enlace_api_gw}}/dev/cursos/listar",
+					"protocol": "https",
+					"host": [
+						"{{enlace_api_gw}}"
+					],
+					"path": [
+						"dev",
+						"cursos",
+						"listar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SolicitudesCrear",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"curso_id\": \"CS2034\",\r\n  \"datos\": {\r\n\t\"nombre\": \"Diseño de Sistemas de Información\"\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{enlace_api_gw}}/dev/cursos/crear",
+					"protocol": "https",
+					"host": [
+						"{{enlace_api_gw}}"
+					],
+					"path": [
+						"dev",
+						"cursos",
+						"crear"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,118 @@
+{
+	"info": {
+		"_postman_id": "5b0b3a9a-6c2f-4a0d-9d25-2d203a2613d4",
+		"name": "prodirtec-clientes",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "47972729",
+		"_collection_link": "https://jose-carlos-nomberto-montenegro-s-team.postman.co/workspace/Team-Workspace~85023df0-e686-4597-8c90-2b23088d1948/collection/47972729-5b0b3a9a-6c2f-4a0d-9d25-2d203a2613d4?action=share&source=collection_link&creator=47972729"
+	},
+	"item": [
+		{
+			"name": "ClientesListar",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://{{enlace_api_gw}}/dev/cursos/listar",
+					"protocol": "https",
+					"host": [
+						"{{enlace_api_gw}}"
+					],
+					"path": [
+						"dev",
+						"cursos",
+						"listar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ClientesCrear",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"curso_id\": \"CS2034\",\r\n  \"datos\": {\r\n\t\"nombre\": \"Diseño de Sistemas de Información\"\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{enlace_api_gw}}/dev/cursos/crear",
+					"protocol": "https",
+					"host": [
+						"{{enlace_api_gw}}"
+					],
+					"path": [
+						"dev",
+						"cursos",
+						"crear"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ClientesModificar",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"curso_id\": \"CS2032\",\r\n  \"datos\": {\r\n\t\"nombre\": \"Cloud Computing 2\"\r\n  }\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{enlace_api_gw}}/dev/cursos/modificar",
+					"protocol": "https",
+					"host": [
+						"{{enlace_api_gw}}"
+					],
+					"path": [
+						"dev",
+						"cursos",
+						"modificar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ClientesEliminar",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"curso_id\": \"CS2034\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://{{enlace_api_gw}}/dev/cursos/eliminar",
+					"protocol": "https",
+					"host": [
+						"{{enlace_api_gw}}"
+					],
+					"path": [
+						"dev",
+						"cursos",
+						"eliminar"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
