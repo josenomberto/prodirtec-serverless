@@ -24,7 +24,7 @@ def lambda_handler(event, context):
     new_solicitud_id = str(uuid.uuid4())
     item = {
         'solicitud_id': new_solicitud_id,
-        'client_id': body.get('client_id'), # Usar client_id consistente con el servicio de clientes
+        'cliente_id': body.get('cliente_id'), # Usar client_id consistente con el servicio de clientes
         'servicio_solicitado': body.get('servicio_solicitado'),
         'detalles': body.get('detalles'),
         'presupuesto_estimado': body.get('presupuesto_estimado'),
